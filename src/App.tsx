@@ -4,7 +4,7 @@ import viteLogo from '/vite.svg'
 import Payment from './components/Payment'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState<number>(0)
 
   return (
     <div className="min-h-screen bg-gray-100 py-12 px-4">

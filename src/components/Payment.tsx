@@ -1,7 +1,17 @@
-import { useState } from 'react'
+import { useState, ChangeEvent, FormEvent } from 'react'
+
+interface FormData {
+  nameOnCard: string
+  cardNumber: string
+  cvv: string
+  month: string
+  year: string
+  comments: string
+  sameAsShipping: boolean
+}
 
 function Payment() {
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     nameOnCard: 'John Doe',
     cardNumber: '1234 5678 9012 3456',
     cvv: '123',
@@ -11,15 +21,16 @@ function Payment() {
     sameAsShipping: true
   })
 
-  const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const target = e.target as HTMLInputElement
+    const { name, value, type, checked } = target
     setFormData(prev => ({
       ...prev,
       [name]: type === 'checkbox' ? checked : value
     }))
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     console.log('Payment submitted:', { ...formData })
   }
@@ -82,7 +93,7 @@ function Payment() {
               onChange={handleInputChange}
               className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none"
               placeholder="123"
-              maxLength="3"
+              maxLength={3}
             />
           </div>
         </div>
@@ -157,7 +168,7 @@ function Payment() {
             name="comments"
             value={formData.comments}
             onChange={handleInputChange}
-            rows="4"
+            rows={4}
             className="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-blue-500 focus:outline-none resize-none"
             placeholder="Add any additional comments"
           />
