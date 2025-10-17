@@ -1,8 +1,10 @@
-# MCP Setup Guide - Playwright Browser Automation
+# MCP Setup Guide - Browser Automation & GitHub Integration
 
 ## What is MCP?
 
-MCP (Model Context Protocol) allows GitHub Copilot to interact with external tools and services. In this project, we've configured Playwright MCP for browser automation.
+MCP (Model Context Protocol) allows GitHub Copilot to interact with external tools and services. In this project, we've configured:
+- 🎭 **Playwright MCP**: Browser automation and testing
+- 🐙 **GitHub MCP**: Repository analysis and code style guidelines
 
 ## Configuration
 
@@ -13,10 +15,14 @@ File: `.vscode/mcp.json`
   "mcpServers": {
     "playwright": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@executeautomation/playwright-mcp-server"
-      ]
+      "args": ["-y", "@executeautomation/playwright-mcp-server"]
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": ""
+      }
     }
   }
 }
@@ -27,10 +33,13 @@ File: `.vscode/mcp.json`
 - ✅ VS Code with GitHub Copilot extension
 - ✅ Node.js and npm installed
 - ✅ npx available (comes with npm)
+- ✅ GitHub Personal Access Token (for GitHub MCP)
 
 ## How to Use
 
-### Example 1: Check Website Contact Location
+### Playwright MCP Examples
+
+#### Example 1: Check Website Contact Location
 
 **Prompt:**
 ```
@@ -43,7 +52,7 @@ File: `.vscode/mcp.json`
 3. Finds contact/location information
 4. Verifies if "Nonthaburi" is mentioned
 
-### Example 2: Test Transfer API Swagger UI
+#### Example 2: Test Transfer API Swagger UI
 
 **Prompt:**
 ```
@@ -56,22 +65,51 @@ File: `.vscode/mcp.json`
 3. Executes test requests
 4. Validates responses
 
-### Example 3: Automated Testing
+### GitHub MCP Examples
+
+#### Example 1: Follow Repository Style Guidelines
 
 **Prompt:**
 ```
-ใช้ Playwright MCP ทดสอบว่า homepage โหลดภายใน 3 วินาที และมีคำว่า "Transfer" ปรากฏ
+จง follow style guideline ตาม repo kbtg-ai-workshop-oct Docs
 ```
+
+**What it does:**
+1. Reads code patterns from https://github.com/mikelopster/kbtg-ai-workshop-oct
+2. Analyzes workshop documentation and examples
+3. Applies style guidelines to your code
+4. Suggests improvements based on workshop patterns
+
+#### Example 2: Compare Implementation
+
+**Prompt:**
+```
+ใช้ GitHub MCP เปรียบเทียบ code structure ของเรากับ repo kbtg-ai-workshop-oct
+```
+
+**What it does:**
+1. Fetches repository structure from GitHub
+2. Compares with current implementation
+3. Highlights differences
+4. Suggests alignment improvements
 
 ## Available MCP Commands
 
-The Playwright MCP server provides tools for:
+### Playwright MCP Tools
 
 - 🌐 **Browser Navigation**: `playwright_navigate`
 - 🖱️ **Element Interaction**: `playwright_click`, `playwright_fill`
 - 📸 **Screenshots**: `playwright_screenshot`
 - ✅ **Assertions**: Check text, attributes, visibility
 - 🔍 **Element Selection**: By CSS, XPath, text content
+
+### GitHub MCP Tools
+
+- 📁 **Repository Access**: `github_list_repos`, `github_get_repo`
+- 📄 **File Operations**: `github_get_file_contents`, `github_search_code`
+- 🔍 **Search**: `github_search_repositories`, `github_search_issues`
+- 📊 **Analysis**: Read code patterns, documentation, examples
+- 🔄 **Compare**: Analyze differences between implementations
 
 ## Troubleshooting
 
@@ -84,7 +122,20 @@ npx --version
 
 # Test Playwright MCP manually
 npx -y @executeautomation/playwright-mcp-server
+
+# Test GitHub MCP manually
+npx -y @modelcontextprotocol/server-github
 ```
+
+### Issue: GitHub MCP authentication failed
+
+**Solution:**
+1. Create Personal Access Token at https://github.com/settings/tokens
+2. Add token to `.vscode/mcp.json` or export as environment variable:
+   ```bash
+   export GITHUB_PERSONAL_ACCESS_TOKEN="your_token_here"
+   ```
+3. Restart VS Code
 
 ### Issue: VS Code doesn't recognize MCP
 
@@ -108,9 +159,27 @@ npm install -g npm@latest
 
 1. ✅ `.vscode/mcp.json` file exists
 2. ✅ npx command is available: `which npx`
-3. ✅ VS Code workspace opened at repository root
-4. ✅ GitHub Copilot extension active
-5. ✅ Try a simple Playwright prompt to test
+3. ✅ GitHub token configured (for GitHub MCP)
+4. ✅ VS Code workspace opened at repository root
+5. ✅ GitHub Copilot extension active
+6. ✅ Try a simple prompt to test both MCPs
+
+## Example Prompts to Test
+
+### Test Playwright MCP
+```
+ใช้ Playwright MCP เปิด https://www.kbtg.tech และบอกว่ามีหัวข้ออะไรบ้าง
+```
+
+### Test GitHub MCP
+```
+ใช้ GitHub MCP อ่าน README จาก repo mikelopster/kbtg-ai-workshop-oct
+```
+
+### Combined Test
+```
+จง follow style guideline ตาม repo kbtg-ai-workshop-oct และแสดงตัวอย่าง code ที่ควรปรับปรุง
+```
 
 ## Example Output
 
@@ -129,7 +198,9 @@ When you ask Copilot to use Playwright MCP:
 
 - 📚 [VS Code MCP Documentation](https://code.visualstudio.com/docs/copilot/customization/mcp-servers)
 - 🎭 [Playwright MCP Server](https://mcp.so/server/playwright-mcp/microsoft)
-- 🛠️ [Workshop Guide](https://github.com/mikelopster/kbtg-ai-workshop-oct/blob/main/workshop-5/prompt.md)
+- � [GitHub MCP Server](https://github.com/modelcontextprotocol/servers/tree/main/src/github)
+- �🛠️ [Workshop Guide](https://github.com/mikelopster/kbtg-ai-workshop-oct/blob/main/workshop-5/prompt.md)
+- 📖 [Workshop Repository](https://github.com/mikelopster/kbtg-ai-workshop-oct)
 
 ## Notes
 
@@ -137,8 +208,12 @@ When you ask Copilot to use Playwright MCP:
 - First run may take longer (npm package download)
 - Browser sessions are temporary (closed after task)
 - Playwright runs in headless mode by default
+- GitHub MCP requires Personal Access Token
+- Token should have `repo` and `read:org` scopes
+- Never commit tokens to git repository
 
 ---
 
 **Setup Date:** October 17, 2025  
-**Workshop:** KBTG AI Workshop - Workshop 5
+**Workshop:** KBTG AI Workshop - Workshop 5  
+**MCPs Configured:** Playwright + GitHub
