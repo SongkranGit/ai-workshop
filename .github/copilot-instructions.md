@@ -138,6 +138,51 @@ models/ (Data Structures)
 ❌ Don't leave connections open
 ```
 
+## 📋 Business Rules (Current Implementation)
+
+### User Validation Rules
+1. **Name Length Limit:**
+   - `first_name` and `last_name` must not exceed 3 characters
+   - Uses `utf8.RuneCountInString()` for Unicode support
+   - Validated in `UserService.Create()` and `UserService.Update()`
+
+### Transfer Validation Rules
+1. **No Consecutive Same Recipient:**
+   - Cannot transfer to the same recipient as the last completed transfer
+   - Checks `GetLastTransferRecipient()` before creating new transfer
+   - Prevents spam and accidental duplicate transfers
+
+2. **No Self-Transfer:**
+   - Cannot transfer points to yourself (`fromUserId == toUserId`)
+   - Validated before transaction begins
+
+3. **Sufficient Balance:**
+   - `fromUser.pointsBalance >= amount`
+   - Checked before deducting points
+
+4. **Amount Validation:**
+   - Amount must be greater than 0
+   - No upper limit (removed 2.00 limit)
+   - Uses INTEGER in database (no decimal issues)
+
+5. **User Existence:**
+   - Both sender and receiver must exist in database
+   - Returns 404 if user not found
+
+6. **Idempotency:**
+   - Auto-generates UUID for each transfer (`idemKey`)
+   - System handles idempotent requests internally
+   - Returns existing transfer if same key is used
+
+### Transfer Flow
+```
+Status: "completed" (immediate completion)
+No pending/processing states in current implementation
+All transfers complete atomically within transaction
+```
+
+**IMPORTANT:** Don't add validation rules not listed above without discussion.
+
 ## 🌐 API Design Guidelines
 
 **OpenAPI Compliance:**
@@ -258,10 +303,10 @@ models/ (Data Structures)
    - ❌ Don't add CORS rules without approval
 
 3. **Business Logic:**
-   - ❌ Don't invent business rules (e.g., transfer limits, validation rules)
+   - ❌ Don't invent business rules beyond existing ones
    - ❌ Don't modify calculation logic without confirmation
-   - ❌ Don't change status flow (pending → processing → completed)
-   - ❌ Don't add new transfer states arbitrarily
+   - ❌ Don't change status flow or add new transfer states
+   - ❌ Don't remove existing validation rules
 
 4. **External Integrations:**
    - ❌ Don't add external API calls without discussion
@@ -358,11 +403,26 @@ lastRecipient, err := s.userRepo.GetLastTransferRecipient(req.FromUserID)
 
 ## 📖 References
 
-- **Project Style Guide:** `/STYLE_GUIDE.md`
-- **API Specification:** `/backend/swagger.yml`
-- **Database Schema:** `/backend/database.md`
-- **MCP Setup:** `/MCP_SETUP.md`
-- **Workshop Reference:** https://github.com/mikelopster/kbtg-ai-workshop-oct
+**Project Documentation:**
+- **Style Guide:** `/STYLE_GUIDE.md` - Coding standards and best practices
+- **API Specification:** `/backend/swagger.yml` - OpenAPI 3.1.0 spec
+- **Database Schema:** `/backend/database.md` - ER diagram with Mermaid
+- **Sequence Diagrams:** `/backend/result.md` - API flow diagrams
+- **MCP Setup:** `/MCP_SETUP.md` - Model Context Protocol configuration
+
+**Code Structure:**
+- **Models:** `/backend/models/` - Data structures and DTOs
+- **Repositories:** `/backend/repositories/` - Database access layer
+- **Services:** `/backend/services/` - Business logic layer
+- **Handlers:** `/backend/handlers/` - HTTP request handlers
+
+**External References:**
+- **Workshop:** https://github.com/mikelopster/kbtg-ai-workshop-oct
+- **Task Specification:** https://github.com/mikelopster/kbtg-ai-workshop-oct/blob/main/workshop-4/task.md
+- **Official Swagger:** https://github.com/mikelopster/kbtg-ai-workshop-oct/blob/main/workshop-4/specs/transfer.yml
+
+**Project Repository:**
+- **GitHub:** https://github.com/SongkranGit/ai-workshop
 
 ## 🎯 Priority Rules
 
